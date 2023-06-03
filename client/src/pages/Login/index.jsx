@@ -1,12 +1,30 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, Button } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Divider from '../../components/Divider';
+import { LoginUser } from '../../apicalls/users';
 
 const Login = () => {
-  const onFinish = (values) => {
-    console.log(values);
+  const navigate = useNavigate();
+  const onFinish = async (values) => {
+    try {
+      const response = await LoginUser(values);
+      const { success, data, message } = response;
+      if (success) {
+        localStorage.setItem('token', data);
+        navigate('/');
+      } else {
+        throw new Error(message);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/');
+    }
+  }, [navigate]);
   return (
     <div className='grid grid-cols-2'>
       <div className='bg-primary h-screen flex flex-col justify-center items-center'>

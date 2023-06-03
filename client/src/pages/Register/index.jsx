@@ -1,12 +1,30 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Form, Input, Button } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Divider from '../../components/Divider';
+import { RegisterUser } from '../../apicalls/users';
 
 const Register = () => {
-  const onFinish = (values) => {
-    console.log(values);
+  const navigate = useNavigate();
+  const onFinish = async (values) => {
+    try {
+      const response = await RegisterUser(values);
+      const { message, success } = response;
+      if (success) {
+        alert(message);
+        navigate('/login');
+      } else {
+        throw new Error(message);
+      }
+    } catch (error) {
+      alert(error.message);
+    }
   };
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/');
+    }
+  }, [navigate]);
   return (
     <div className='grid grid-cols-2'>
       <div className='bg-primary h-screen flex flex-col justify-center items-center'>
@@ -40,7 +58,7 @@ const Register = () => {
 
             <div className='flex justify-center mt-5'>
               <span>
-                Already have an account <Link to='/login'>Login</Link>
+                Already have an account? <Link to='/login'>Login</Link>
               </span>
             </div>
           </Form>
