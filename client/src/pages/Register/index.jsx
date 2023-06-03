@@ -3,12 +3,18 @@ import { Form, Input, Button } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import Divider from '../../components/Divider';
 import { RegisterUser } from '../../apicalls/users';
+import { useDispatch, useSelector } from 'react-redux';
+import { SetButtonLoading } from '../../redux/loadersSlice';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { buttonLoading } = useSelector((state) => state.loaders);
+  const dispatch = useDispatch();
   const onFinish = async (values) => {
     try {
+      dispatch(SetButtonLoading(true));
       const response = await RegisterUser(values);
+      dispatch(SetButtonLoading(false));
       const { message, success } = response;
       if (success) {
         alert(message);
@@ -17,6 +23,7 @@ const Register = () => {
         throw new Error(message);
       }
     } catch (error) {
+      dispatch(SetButtonLoading(false));
       alert(error.message);
     }
   };
@@ -40,20 +47,61 @@ const Register = () => {
           <h1 className='text-2xl text-gray-700'>LET'S GET YOU STARTED</h1>
           <Divider />
           <Form onFinish={onFinish} layout='vertical'>
-            <Form.Item label='First Name' name='firstName'>
+            <Form.Item
+              label='First Name'
+              name='firstName'
+              rules={[
+                {
+                  required: true,
+                  message: 'Required',
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
-            <Form.Item label='Last Name' name='lastName'>
+            <Form.Item
+              label='Last Name'
+              name='lastName'
+              rules={[
+                {
+                  required: true,
+                  message: 'Required',
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
-            <Form.Item label='Email' name='email'>
+            <Form.Item
+              label='Email'
+              name='email'
+              rules={[
+                {
+                  required: true,
+                  message: 'Required',
+                },
+              ]}
+            >
               <Input type='email' />
             </Form.Item>
-            <Form.Item label='Password' name='password'>
+            <Form.Item
+              label='Password'
+              name='password'
+              rules={[
+                {
+                  required: true,
+                  message: 'Required',
+                },
+              ]}
+            >
               <Input type='password' />
             </Form.Item>
-            <Button type='primary' htmlType='submit' block>
-              Submit
+            <Button
+              type='primary'
+              htmlType='submit'
+              block
+              loading={buttonLoading}
+            >
+              {buttonLoading ? 'Loading' : 'Register'}
             </Button>
 
             <div className='flex justify-center mt-5'>
