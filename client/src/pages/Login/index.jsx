@@ -5,6 +5,7 @@ import Divider from '../../components/Divider';
 import { LoginUser } from '../../apicalls/users';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetButtonLoading } from '../../redux/loadersSlice';
+import { antdFormRules } from '../../utils/helper';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -48,18 +49,10 @@ const Login = () => {
           <h1 className='text-2xl text-gray-700'>LOGIN TO YOUR ACCOUNT</h1>
           <Divider />
           <Form onFinish={onFinish} layout='vertical'>
-            <Form.Item
-              label='Email'
-              name='email'
-              rules={[{ required: true, message: 'Required' }]}
-            >
+            <Form.Item label='Email' name='email' rules={antdFormRules}>
               <Input type='email' />
             </Form.Item>
-            <Form.Item
-              label='Password'
-              name='password'
-              rules={[{ required: true, message: 'Required' }]}
-            >
+            <Form.Item label='Password' name='password' rules={antdFormRules}>
               <Input type='password' />
             </Form.Item>
             <Button

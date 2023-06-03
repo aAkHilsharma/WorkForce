@@ -5,6 +5,7 @@ import Divider from '../../components/Divider';
 import { RegisterUser } from '../../apicalls/users';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetButtonLoading } from '../../redux/loadersSlice';
+import { antdFormRules } from '../../utils/helper';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -50,49 +51,17 @@ const Register = () => {
             <Form.Item
               label='First Name'
               name='firstName'
-              rules={[
-                {
-                  required: true,
-                  message: 'Required',
-                },
-              ]}
+              rules={antdFormRules}
             >
               <Input />
             </Form.Item>
-            <Form.Item
-              label='Last Name'
-              name='lastName'
-              rules={[
-                {
-                  required: true,
-                  message: 'Required',
-                },
-              ]}
-            >
+            <Form.Item label='Last Name' name='lastName' rules={antdFormRules}>
               <Input />
             </Form.Item>
-            <Form.Item
-              label='Email'
-              name='email'
-              rules={[
-                {
-                  required: true,
-                  message: 'Required',
-                },
-              ]}
-            >
+            <Form.Item label='Email' name='email' rules={antdFormRules}>
               <Input type='email' />
             </Form.Item>
-            <Form.Item
-              label='Password'
-              name='password'
-              rules={[
-                {
-                  required: true,
-                  message: 'Required',
-                },
-              ]}
-            >
+            <Form.Item label='Password' name='password' rules={antdFormRules}>
               <Input type='password' />
             </Form.Item>
             <Button
