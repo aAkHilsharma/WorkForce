@@ -38,4 +38,34 @@ router.post('/get-all-projects', authMiddleWare, async (req, res) => {
   }
 });
 
+router.post('/edit-project', authMiddleWare, async (req, res) => {
+  try {
+    await Project.findByIdAndUpdate(req.body._id, req.body);
+    res.send({
+      success: true,
+      message: 'Project Updated successfully',
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+router.delete('/delete-project', authMiddleWare, async (req, res) => {
+  try {
+    await Project.findByIdAndDelete(req.body._id);
+    res.send({
+      success: true,
+      message: 'Project deleted successfully',
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;
