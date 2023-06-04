@@ -25,7 +25,7 @@ router.post('/create-project', authMiddleWare, async (req, res) => {
 router.post('/get-all-projects', authMiddleWare, async (req, res) => {
   try {
     const filters = req.body.filters;
-    const projects = await Project.find(filters || {});
+    const projects = await Project.find(filters || {}).sort({ createdAt: -1 });
     res.send({
       success: true,
       data: projects,
@@ -34,6 +34,46 @@ router.post('/get-all-projects', authMiddleWare, async (req, res) => {
     res.send({
       success: false,
       error: error.message,
+    });
+  }
+});
+
+//get project by role
+router.post('/get-projects-by-role', authMiddleWare, async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const projects = await Project.find({ 'members.user': userId })
+      .sort({
+        createdAt: -1,
+      })
+      .populate('owner');
+    res.send({
+      success: true,
+      data: projects,
+    });
+  } catch (error) {
+    res.send({
+      error: error.message,
+      success: false,
+    });
+  }
+});
+
+// get project by id
+router.post('/get-project-by-id', authMiddleWare, async (req, res) => {
+  try {
+    const project = await Project.findById(req.body._id)
+      .populate('owner')
+      .populate('members.user');
+
+    res.send({
+      success: true,
+      data: project,
+    });
+  } catch (error) {
+    res.send({
+      error: error.message,
+      success: false,
     });
   }
 });
