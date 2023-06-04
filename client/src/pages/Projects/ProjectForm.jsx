@@ -20,7 +20,7 @@ const ProjectForm = ({ show, setShow, reloadData, project }) => {
         setShow(false);
       } else {
         values.owner = user._id;
-        values.member = [
+        values.members = [
           {
             user: user._id,
             role: 'owner',
