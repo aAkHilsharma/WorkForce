@@ -5,3 +5,9 @@ export const CreateProject = async (project) =>
 
 export const GetAllProjects = async (filters) =>
   apiRequest('post', '/api/projects/get-all-projects', filters);
+
+export const EditProject = async (project) =>
+  apiRequest('post', '/api/projects/edit-project', project);
+
+export const DeleteProject = async (id) =>
+  apiRequest('delete', '/api/projects/delete-project', { _id: id });
