@@ -4,7 +4,7 @@ import TextArea from 'antd/es/input/TextArea';
 import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetLoading } from '../../redux/loadersSlice';
-import { CreateProject } from '../../apicalls/project';
+import { CreateProject, EditProject } from '../../apicalls/project';
 
 const ProjectForm = ({ show, setShow, reloadData, project }) => {
   const formRef = useRef(null);
@@ -13,8 +13,11 @@ const ProjectForm = ({ show, setShow, reloadData, project }) => {
   const onFinish = async (values) => {
     try {
       dispatch(SetLoading(true));
+      let response = null;
       if (project) {
-        // update
+        values._id = project._id;
+        response = await EditProject(values);
+        setShow(false);
       } else {
         values.owner = user._id;
         values.member = [
@@ -23,16 +26,16 @@ const ProjectForm = ({ show, setShow, reloadData, project }) => {
             role: 'owner',
           },
         ];
-        const response = await CreateProject(values);
-        if (response.success) {
-          alert(response.message);
-          reloadData();
-          setShow(false);
-        } else {
-          throw new Error(response.error);
-        }
-        dispatch(SetLoading(false));
+        response = await CreateProject(values);
       }
+      if (response.success) {
+        alert(response.message);
+        reloadData();
+        setShow(false);
+      } else {
+        throw new Error(response.error);
+      }
+      dispatch(SetLoading(false));
     } catch (error) {
       dispatch(SetLoading(false));
       alert(error.message);
@@ -40,7 +43,7 @@ const ProjectForm = ({ show, setShow, reloadData, project }) => {
   };
   return (
     <Modal
-      title='Add Projects'
+      title={project ? 'EDIT PROJECT' : 'CREATE PROJECT'}
       open={show}
       onCancel={() => setShow(false)}
       centered
@@ -50,7 +53,12 @@ const ProjectForm = ({ show, setShow, reloadData, project }) => {
       }}
       okText='Save'
     >
-      <Form layout='vertical' ref={formRef} onFinish={onFinish}>
+      <Form
+        initialValues={project}
+        layout='vertical'
+        ref={formRef}
+        onFinish={onFinish}
+      >
         <FormItem label='Project Name' name='name'>
           <Input placeholder='Project Name' />
         </FormItem>
