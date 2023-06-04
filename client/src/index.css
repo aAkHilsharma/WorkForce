@@ -32,6 +32,15 @@ input:focus, textarea:focus {
   border: 1px solid #555353 !important;
 }
 
+table {
+  border: 1px solid #ccc !important;
+  border-radius: 0 !important;
+}
+
+i {
+  font-size: 20px !important;
+}
+
 .ant-form-item {
   margin-bottom: 10 !important;
 }
