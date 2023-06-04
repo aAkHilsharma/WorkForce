@@ -2,11 +2,41 @@ import { Form, Input, Modal } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
 import TextArea from 'antd/es/input/TextArea';
 import React, { useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { SetLoading } from '../../redux/loadersSlice';
+import { CreateProject } from '../../apicalls/project';
 
-const ProjectForm = ({ show, setShow, reloadData }) => {
+const ProjectForm = ({ show, setShow, reloadData, project }) => {
   const formRef = useRef(null);
-  const onFinish = (values) => {
-    console.log(values);
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.users);
+  const onFinish = async (values) => {
+    try {
+      dispatch(SetLoading(true));
+      if (project) {
+        // update
+      } else {
+        values.owner = user._id;
+        values.member = [
+          {
+            user: user._id,
+            role: 'owner',
+          },
+        ];
+        const response = await CreateProject(values);
+        if (response.success) {
+          alert(response.message);
+          reloadData();
+          setShow(false);
+        } else {
+          throw new Error(response.error);
+        }
+        dispatch(SetLoading(false));
+      }
+    } catch (error) {
+      dispatch(SetLoading(false));
+      alert(error.message);
+    }
   };
   return (
     <Modal
