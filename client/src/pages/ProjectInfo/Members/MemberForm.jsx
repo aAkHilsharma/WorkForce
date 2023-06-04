@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Form, Input, Modal } from 'antd';
 import { useDispatch } from 'react-redux';
 import { SetLoading } from '../../../redux/loadersSlice';
+import { antdFormRules } from '../../../utils/helper';
 import { AddMemberToProject } from '../../../apicalls/project';
 
 const MemberForm = ({
@@ -53,11 +54,12 @@ const MemberForm = ({
       }}
     >
       <Form ref={formRef} layout='vertical' onFinish={onFinish}>
-        <Form.Item label='Email' name='email'>
+        <Form.Item label='Email' name='email' rules={antdFormRules}>
           <Input placeholder='Email' />
         </Form.Item>
-        <Form.Item label='Role' name='role'>
+        <Form.Item label='Role' name='role' rules={antdFormRules}>
           <select>
+            <option value=''>Select Role</option>
             <option value='admin'>Admin</option>
             <option value='employee'>Employee</option>
           </select>
