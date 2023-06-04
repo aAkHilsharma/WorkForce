@@ -23,7 +23,7 @@ const ProjectInfo = () => {
     {
       key: '2',
       label: 'Members',
-      children: <Members />,
+      children: <Members project={project} />,
     },
   ];
 
