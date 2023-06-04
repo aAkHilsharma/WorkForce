@@ -25,6 +25,7 @@ const projectSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
+      default: 'active',
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
