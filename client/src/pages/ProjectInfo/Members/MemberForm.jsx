@@ -32,6 +32,8 @@ const MemberForm = ({
         });
         if (response.success) {
           alert(response.message);
+          reloadData();
+          setShowMemberForm(false);
         } else {
           throw new Error(response.message);
         }
