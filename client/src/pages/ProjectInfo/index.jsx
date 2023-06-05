@@ -23,9 +23,9 @@ const ProjectInfo = () => {
       if (response.success) {
         setProject(response.data);
         const currentUser = response.data.members.find(
-          (member) => member.user._id === user._id
+          (member) => member.user._id === user?._id
         );
-        setUserRole(currentUser.role);
+        setUserRole(currentUser?.role);
       } else {
         throw new Error(response.message);
       }
@@ -34,7 +34,7 @@ const ProjectInfo = () => {
       dispatch(SetLoading(false));
       alert(error.message);
     }
-  }, [dispatch, id, user._id]);
+  }, [dispatch, id, user?._id]);
 
   useEffect(() => {
     getData();
@@ -44,7 +44,7 @@ const ProjectInfo = () => {
     {
       key: '1',
       label: 'Task',
-      children: <Tasks />,
+      children: <Tasks project={project} />,
     },
     {
       key: '2',
