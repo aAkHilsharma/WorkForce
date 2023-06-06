@@ -3,14 +3,18 @@ import { Button, Table } from 'antd';
 import TaskForm from './TaskForm';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetLoading } from '../../../redux/loadersSlice';
-import { GetAllTasks } from '../../../apicalls/tasks';
+import { DeleteTask, GetAllTasks } from '../../../apicalls/tasks';
 import { getDateFormat } from '../../../utils/helper';
 
 const Tasks = ({ project }) => {
   const [showTaskForm, setShowTaskForm] = useState(false);
-  const [tasks, setTask] = useState(null);
+  const [task, setTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.users);
+  const isEmployee = project.members.find(
+    (member) => member.role === 'employee' && member.user._id === user._id
+  );
 
   const getTasks = useCallback(async () => {
     try {
@@ -33,6 +37,22 @@ const Tasks = ({ project }) => {
   useEffect(() => {
     getTasks();
   }, [getTasks]);
+
+  const deleteHandler = async (id) => {
+    try {
+      dispatch(SetLoading(true));
+      const response = await DeleteTask(id);
+      if (response.success) {
+        getTasks();
+        alert(response.message);
+      } else {
+        throw new Error(response.message);
+      }
+      dispatch(SetLoading(false));
+    } catch (error) {
+      dispatch(SetLoading(false));
+    }
+  };
 
   const columns = [
     {
@@ -62,14 +82,34 @@ const Tasks = ({ project }) => {
       render: (text, record) => text.toUpperCase(),
     },
     {
-      title: 'action',
+      title: 'Action',
       dataIndex: 'action',
+      render: (text, record) => {
+        return (
+          <div className='flex gap-6'>
+            {!isEmployee && (
+              <i
+                className='ri-delete-bin-line cursor-pointer text-red-500'
+                onClick={() => {
+                  deleteHandler(record._id);
+                }}
+              ></i>
+            )}
+            <i
+              className='ri-pencil-line cursor-pointer'
+              onClick={() => {
+                setSelectedTask({
+                  ...record,
+                  assignedTo: record.assignedTo.email,
+                });
+                setShowTaskForm(true);
+              }}
+            ></i>
+          </div>
+        );
+      },
     },
   ];
-
-  const isEmployee = project.members.find(
-    (member) => member.role === 'employee' && member.user._id === user._id
-  );
 
   return (
     <div>
@@ -84,7 +124,7 @@ const Tasks = ({ project }) => {
           </Button>
         )}
       </div>
-      <Table className='mt-4' columns={columns} dataSource={tasks} />
+      <Table className='mt-4' columns={columns} dataSource={task} />
 
       {showTaskForm && (
         <TaskForm
@@ -92,6 +132,7 @@ const Tasks = ({ project }) => {
           setShowTaskForm={setShowTaskForm}
           project={project}
           reloadData={getTasks}
+          task={selectedTask}
         />
       )}
     </div>

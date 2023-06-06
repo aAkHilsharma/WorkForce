@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Input, Modal } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import { CreateTask } from '../../../apicalls/tasks';
+import { CreateTask, UpdateTask } from '../../../apicalls/tasks';
 import { SetLoading } from '../../../redux/loadersSlice';
 
 const TaskForm = ({
@@ -22,6 +22,12 @@ const TaskForm = ({
       let response = null;
       dispatch(SetLoading(true));
       if (task) {
+        response = await UpdateTask({
+          ...values,
+          project: project._id,
+          assignedTo: task.assignedTo._id,
+          _id: task._id,
+        });
       } else {
         const assignedToMember = project.members.find(
           (member) => member.user.email === email
@@ -61,15 +67,21 @@ const TaskForm = ({
   return (
     project && (
       <Modal
-        title='ADD TASK'
+        title={task ? 'UPDATE TASK' : 'ADD TASK'}
         open={showTaskForm}
         onCancel={() => setShowTaskForm(false)}
         centered
         onOk={() => {
           formRef.current.submit();
         }}
+        okText='ADD'
       >
-        <Form layout='vertical' ref={formRef} onFinish={onFinish}>
+        <Form
+          layout='vertical'
+          ref={formRef}
+          onFinish={onFinish}
+          initialValues={task}
+        >
           <Form.Item label='Task Name' name='name'>
             <Input />
           </Form.Item>
@@ -80,6 +92,7 @@ const TaskForm = ({
             <Input
               placeholder='Enter email of the employee'
               onChange={(e) => setEmail(e.target.value)}
+              disabled={task ? true : false}
             />
           </Form.Item>
           {email && !validateEmail() && (
