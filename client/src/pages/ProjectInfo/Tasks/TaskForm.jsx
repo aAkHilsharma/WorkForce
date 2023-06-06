@@ -4,6 +4,7 @@ import { Form, Input, Modal } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { CreateTask, UpdateTask } from '../../../apicalls/tasks';
 import { SetLoading } from '../../../redux/loadersSlice';
+import { AddNotification } from '../../../apicalls/notifications';
 
 const TaskForm = ({
   showTaskForm,
@@ -43,6 +44,15 @@ const TaskForm = ({
         });
       }
       if (response.success) {
+        if (!task) {
+          // send notification to employee
+          AddNotification({
+            user: response.data.assignedTo,
+            title: `You have been assigned to a new task in ${project.name}`,
+            onClick: `project/${project._id}`,
+            description: values.description,
+          });
+        }
         reloadData();
         alert(response.message);
         setShowTaskForm(false);

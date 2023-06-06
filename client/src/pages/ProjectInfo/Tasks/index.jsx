@@ -6,6 +6,7 @@ import { SetLoading } from '../../../redux/loadersSlice';
 import { DeleteTask, GetAllTasks, UpdateTask } from '../../../apicalls/tasks';
 import Divider from '../../../components/Divider';
 import { getDateFormat } from '../../../utils/helper';
+import { AddNotification } from '../../../apicalls/notifications';
 
 const Tasks = ({ project }) => {
   const [viewTask, setViewTask] = useState(null);
@@ -57,16 +58,22 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const onStatusUpdate = async (id, status) => {
+  const onStatusUpdate = async ({ task, status }) => {
     try {
       dispatch(SetLoading(true));
       const response = await UpdateTask({
-        _id: id,
+        _id: task._id,
         status,
       });
       if (response.success) {
         getTasks();
         alert(response.message);
+        AddNotification({
+          user: task.assignedBy._id,
+          title: 'Status Update',
+          description: `${task.name} status has been updated to ${status}`,
+          onClick: `/project/${project?._id}`,
+        });
       } else {
         throw new Error(response.message);
       }
@@ -117,7 +124,10 @@ const Tasks = ({ project }) => {
           <select
             value={record.status}
             onChange={(e) => {
-              onStatusUpdate(record._id, e.target.value);
+              onStatusUpdate({
+                task: record,
+                status: e.target.value,
+              });
             }}
             disabled={record.assignedTo._id !== user?._id && isEmployee}
           >
