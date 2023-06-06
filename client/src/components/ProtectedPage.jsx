@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GetLoggedInUser } from '../apicalls/users';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,7 +38,7 @@ const ProtectedPage = ({ children }) => {
     }
   }, [dispatch, navigate]);
 
-  const getNotifications = async (req, res) => {
+  const getNotifications = useCallback(async () => {
     try {
       dispatch(SetLoading(true));
       const response = await GetAllNotifications();
@@ -51,17 +51,24 @@ const ProtectedPage = ({ children }) => {
     } catch (error) {
       dispatch(SetLoading(false));
     }
-  };
+  }, [dispatch]);
   useEffect(() => {
     if (user) {
       getNotifications();
     }
-  }, [user]);
+  }, [user, getNotifications]);
 
   return (
     <div>
       <div className='flex justify-between items-center bg-primary text-white px-5 py-4'>
-        <h1 className='text-2xl'>Work-Force</h1>
+        <h1
+          className='text-2xl cursor-pointer'
+          onClick={() => {
+            navigate('/');
+          }}
+        >
+          Work-Force
+        </h1>
         <div className='flex items-center bg-white px-5 py-2 rounded'>
           <span
             className='mr-2 text-primary underline cursor-pointer'
