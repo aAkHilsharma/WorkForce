@@ -20,3 +20,6 @@ export const GetProjectById = async (id) =>
 
 export const AddMemberToProject = async (data) =>
   apiRequest('post', '/api/projects/add-member', data);
+
+export const RemoveMemberFromProject = async (data) =>
+  apiRequest('post', '/api/projects/remove-member', data);
