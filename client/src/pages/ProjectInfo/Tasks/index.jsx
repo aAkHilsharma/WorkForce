@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Table } from 'antd';
+import { Button, Modal, Table } from 'antd';
 import TaskForm from './TaskForm';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetLoading } from '../../../redux/loadersSlice';
-import { DeleteTask, GetAllTasks } from '../../../apicalls/tasks';
+import { DeleteTask, GetAllTasks, UpdateTask } from '../../../apicalls/tasks';
+import Divider from '../../../components/Divider';
 import { getDateFormat } from '../../../utils/helper';
 
 const Tasks = ({ project }) => {
+  const [viewTask, setViewTask] = useState(null);
+  const [showViewTask, setShowViewTask] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [task, setTask] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -54,10 +57,40 @@ const Tasks = ({ project }) => {
     }
   };
 
+  const onStatusUpdate = async (id, status) => {
+    try {
+      dispatch(SetLoading(true));
+      const response = await UpdateTask({
+        _id: id,
+        status,
+      });
+      if (response.success) {
+        getTasks();
+        alert(response.message);
+      } else {
+        throw new Error(response.message);
+      }
+      dispatch(SetLoading(false));
+    } catch (error) {
+      dispatch(SetLoading(false));
+    }
+  };
+
   const columns = [
     {
       title: 'Name',
       dataIndex: 'name',
+      render: (text, record) => (
+        <p
+          className='text-[14px] cursor-pointer underline'
+          onClick={() => {
+            setViewTask(record);
+            setShowViewTask(true);
+          }}
+        >
+          {record.name}
+        </p>
+      ),
     },
     {
       title: 'Assigned To',
@@ -79,7 +112,22 @@ const Tasks = ({ project }) => {
     {
       title: 'Status',
       dataIndex: 'status',
-      render: (text, record) => text.toUpperCase(),
+      render: (text, record) => {
+        return (
+          <select
+            value={record.status}
+            onChange={(e) => {
+              onStatusUpdate(record._id, e.target.value);
+            }}
+            disabled={record.assignedTo._id !== user?._id && isEmployee}
+          >
+            <option value='pending'>Pending</option>
+            <option value='inprogress'>In Progress</option>
+            <option value='completed'>Completed</option>
+            <option value='closed'>Closed</option>
+          </select>
+        );
+      },
     },
     {
       title: 'Action',
@@ -87,14 +135,12 @@ const Tasks = ({ project }) => {
       render: (text, record) => {
         return (
           <div className='flex gap-6'>
-            {!isEmployee && (
-              <i
-                className='ri-delete-bin-line cursor-pointer text-red-500'
-                onClick={() => {
-                  deleteHandler(record._id);
-                }}
-              ></i>
-            )}
+            <i
+              className='ri-delete-bin-line cursor-pointer text-red-500'
+              onClick={() => {
+                deleteHandler(record._id);
+              }}
+            ></i>
             <i
               className='ri-pencil-line cursor-pointer'
               onClick={() => {
@@ -110,7 +156,9 @@ const Tasks = ({ project }) => {
       },
     },
   ];
-
+  if (isEmployee) {
+    columns.pop();
+  }
   return (
     <div>
       <div className='flex justify-end'>
@@ -134,6 +182,24 @@ const Tasks = ({ project }) => {
           reloadData={getTasks}
           task={selectedTask}
         />
+      )}
+
+      {showViewTask && (
+        <Modal
+          title='TASK DETAILS'
+          open={showViewTask}
+          onCancel={() => {
+            setShowViewTask(false);
+          }}
+          centered
+          footer={null}
+        >
+          <Divider />
+          <h2 className='text-2xl text-primary'>{viewTask.name}</h2>
+          <span className='text-gray-500 text-[14px]'>
+            {viewTask.description}
+          </span>
+        </Modal>
       )}
     </div>
   );
