@@ -11,3 +11,6 @@ export const UpdateTask = async (task) =>
 
 export const DeleteTask = async (id) =>
   apiRequest('post', '/api/tasks/delete-task', { _id: id });
+
+export const UploadImage = async (payload) =>
+  apiRequest('post', '/api/tasks/upload-image', payload);
