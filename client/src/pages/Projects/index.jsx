@@ -85,7 +85,8 @@ const Projects = () => {
             <i
               className='ri-pencil-line cursor-pointer'
               onClick={() => {
-                deleteHandler(record._id);
+                setSelectedProject(record);
+                setShow(true);
               }}
             ></i>
           </div>
