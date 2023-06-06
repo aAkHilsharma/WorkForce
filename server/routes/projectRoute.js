@@ -140,4 +140,27 @@ router.post('/add-member', authMiddleWare, async (req, res) => {
   }
 });
 
+//remove a member from a project
+router.post('/remove-member', authMiddleWare, async (req, res) => {
+  try {
+    const { memberId, projectId } = req.body;
+    await Project.findByIdAndUpdate(projectId, {
+      $pull: {
+        members: {
+          _id: memberId,
+        },
+      },
+    });
+    res.send({
+      success: true,
+      message: 'Member removed successfully',
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 module.exports = router;
