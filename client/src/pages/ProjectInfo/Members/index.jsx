@@ -6,6 +6,7 @@ import { SetLoading } from '../../../redux/loadersSlice';
 import { RemoveMemberFromProject } from '../../../apicalls/project';
 
 const Members = ({ project, reloadData }) => {
+  const [role, setRole] = useState('all');
   const { user } = useSelector((state) => state.users);
   const [showMemberForm, setShowMemberForm] = useState(false);
   const onClick = () => {
@@ -81,7 +82,27 @@ const Members = ({ project, reloadData }) => {
         {isOwner && <Button onClick={onClick}>Add Member</Button>}
       </div>
 
-      <Table columns={columns} dataSource={project.members} className='mt-4' />
+      <div className='w-48'>
+        <span>Select Role</span>
+        <select onChange={(e) => setRole(e.target.value)} value={role}>
+          <option value='all'>All</option>
+          <option value='owner'>Owner</option>
+          <option value='admin'>Admin</option>
+          <option value='employee'>Employee</option>
+        </select>
+      </div>
+
+      <Table
+        columns={columns}
+        dataSource={project.members.filter((member) => {
+          if (role === 'all') {
+            return true;
+          } else {
+            return member.role === role;
+          }
+        })}
+        className='mt-4'
+      />
       {showMemberForm && (
         <MemberForm
           showMemberForm={showMemberForm}

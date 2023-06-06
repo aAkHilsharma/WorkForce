@@ -9,6 +9,11 @@ import { getDateFormat } from '../../../utils/helper';
 import { AddNotification } from '../../../apicalls/notifications';
 
 const Tasks = ({ project }) => {
+  const [filters, setFilters] = useState({
+    status: 'all',
+    assignedTo: 'all',
+    assignedBy: 'all',
+  });
   const [viewTask, setViewTask] = useState(null);
   const [showViewTask, setShowViewTask] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -17,7 +22,7 @@ const Tasks = ({ project }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.users);
   const isEmployee = project.members.find(
-    (member) => member.role === 'employee' && member.user._id === user._id
+    (member) => member.role === 'employee' && member.user._id === user?._id
   );
 
   const getTasks = useCallback(async () => {
@@ -25,6 +30,7 @@ const Tasks = ({ project }) => {
       dispatch(SetLoading(true));
       const response = await GetAllTasks({
         project: project._id,
+        ...filters,
       });
       dispatch(SetLoading(false));
       if (response.success) {
@@ -36,7 +42,7 @@ const Tasks = ({ project }) => {
       dispatch(SetLoading(false));
       alert(error.message);
     }
-  }, [dispatch, project._id]);
+  }, [dispatch, project._id, filters]);
 
   useEffect(() => {
     getTasks();
@@ -169,6 +175,10 @@ const Tasks = ({ project }) => {
   if (isEmployee) {
     columns.pop();
   }
+
+  useEffect(() => {
+    getTasks();
+  }, [filters, getTasks]);
   return (
     <div>
       <div className='flex justify-end'>
@@ -181,6 +191,69 @@ const Tasks = ({ project }) => {
             Add Task
           </Button>
         )}
+      </div>
+      <div className='flex gap-5'>
+        <div>
+          <span>Status</span>
+          <select
+            value={filters.status}
+            onChange={(e) => {
+              setFilters({
+                ...filters,
+                status: e.target.value,
+              });
+            }}
+          >
+            <option value='all'>All</option>
+            <option value='pending'>Pending</option>
+            <option value='inprogress'>In Progress</option>
+            <option value='completed'>Completed</option>
+          </select>
+        </div>
+        <div>
+          <span>Assigned By</span>
+          <select
+            value={filters.assignedBy}
+            onChange={(e) => {
+              setFilters({
+                ...filters,
+                assignedBy: e.target.value,
+              });
+            }}
+          >
+            <option value='all'>All</option>
+            {project.members
+              .filter(
+                (member) => member.role === 'admin' || member.role === 'owner'
+              )
+              .map((member) => (
+                <option value={member.user._id}>
+                  {member.user.firstName + ' ' + member.user.lastName}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div>
+          <span>Assigned To</span>
+          <select
+            value={filters.assignedTo}
+            onChange={(e) => {
+              setFilters({
+                ...filters,
+                assignedTo: e.target.value,
+              });
+            }}
+          >
+            <option value='all'>All</option>
+            {project.members
+              .filter((member) => member.role === 'employee')
+              .map((member) => (
+                <option value={member.user._id}>
+                  {member.user.firstName + ' ' + member.user.lastName}
+                </option>
+              ))}
+          </select>
+        </div>
       </div>
       <Table className='mt-4' columns={columns} dataSource={task} />
 
@@ -205,10 +278,25 @@ const Tasks = ({ project }) => {
           footer={null}
         >
           <Divider />
-          <h2 className='text-2xl text-primary'>{viewTask.name}</h2>
-          <span className='text-gray-500 text-[14px]'>
-            {viewTask.description}
-          </span>
+          <div>
+            <h2 className='text-[14px] text-primary font-bold'>
+              {viewTask.name}
+            </h2>
+            <span className='text-gray-500 text-[14px]'>
+              {viewTask.description}
+            </span>
+            <div className='flex gap-5'>
+              {viewTask.attachments.map((image) => {
+                return (
+                  <img
+                    src={image}
+                    alt=''
+                    className='w-40 h-40 object-contain p-2 border-solid border-gray-400 rounded'
+                  />
+                );
+              })}
+            </div>
+          </div>
         </Modal>
       )}
     </div>
