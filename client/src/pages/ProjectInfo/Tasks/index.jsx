@@ -185,6 +185,9 @@ const Tasks = ({ project }) => {
         {!isEmployee && (
           <Button
             onClick={() => {
+              if (selectedTask) {
+                setSelectedTask(null);
+              }
               setShowTaskForm(true);
             }}
           >

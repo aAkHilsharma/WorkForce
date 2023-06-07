@@ -19,7 +19,7 @@ const TaskForm = ({
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.users);
   const [file, setFile] = useState(null);
-  const [images, setImages] = useState(task.attachments || []);
+  const [images, setImages] = useState(task?.attachments || []);
 
   const onFinish = async (values) => {
     try {
@@ -157,10 +157,11 @@ const TaskForm = ({
     {
       key: '2',
       label: 'Attachments',
+      disabled: !task,
       children: (
         <div>
           <div className='flex gap-5 mb-4'>
-            {images.map((image) => {
+            {images?.map((image) => {
               return (
                 <div className='flex gap-3 border-solid border-gray-400 rounded'>
                   <img
@@ -203,7 +204,6 @@ const TaskForm = ({
           </div>
         </div>
       ),
-      disabled: !task,
     },
   ];
 
