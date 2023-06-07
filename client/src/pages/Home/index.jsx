@@ -75,6 +75,13 @@ const Home = () => {
           </div>
         ))}
       </div>
+      {projects.length === 0 && (
+        <div>
+          <span className='text-primary text-xl font-semibold'>
+            You have no projects yet
+          </span>
+        </div>
+      )}
     </div>
   );
 };
