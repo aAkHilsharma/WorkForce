@@ -16,5 +16,16 @@ app.use('/api/projects', projectRoute);
 app.use('/api/tasks', taskRoute);
 app.use('/api/notifications', notificationRoute);
 
+// deployment config
+const path = require('path');
+__dirname = path.resolve();
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '/client/build')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Node server listening on port ${port}`));
